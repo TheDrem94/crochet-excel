@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.cell {
+    border: 1px solid black;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-numbers div {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-numbers {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 25px); /* liczba kolumn taka sama jak w gridzie */
+  margin-bottom: 5px;
+  text-align: center;
+  font-weight: bold;
+}
