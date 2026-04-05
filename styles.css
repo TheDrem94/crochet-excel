@@ -1,29 +1,84 @@
-body {
-    margin: 0;
-    padding: 0;
+/* global cell sizing */
+:root {
+    --cell-size: 25px; /* default sizing */
 }
 
+/* Reset box-sizing */
+* {
+    box-sizing: border-box;
+}
+
+/* slider */
+#cellSizeSlider,
+#widthInput,
+#heightInput,
+#generateBtn {
+    display: flex;
+    padding: 5px;
+    margin: 10px;
+}
+
+/* cell style */
 .cell {
     border: 1px solid black;
-    width: 25px;
-    height: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: calc(var(--cell-size) *0.7);
 }
 
+.cell:hover {
+    background-color: #f1f1f1;
+}
+
+/* top numbers style */
 .top-numbers div {
-    width: 25px;
-    height: 25px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    font-weight: bold;
 }
 
+/* top numbers container */
 .top-numbers {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 25px); /* liczba kolumn taka sama jak w gridzie */
-  margin-bottom: 5px;
-  text-align: center;
-  font-weight: bold;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--cell-size)); /* cols fit */
+    text-align: center;
+}
+
+/* left numbers style */
+.left-numbers div {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+/* left numbers container */
+.left-numbers {
+    display: grid;
+    grid-template-rows: repeat(var(--rows), var(--cell-size)); /* rows fit */
+    text-align: center;
+}
+
+/* Wrapper 2x2: top left corner | top | left | grid */
+#wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 5px;
+    align-items: start;
+}
+
+/* Grid  */
+#grid {
+    display: grid;
 }

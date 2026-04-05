@@ -7,11 +7,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <input id="width" type="number" placeholder="width">
-    <input id="height" type="number" placeholder="height">
-    <button id="generate">Generate</button>
-    <div class="top-numbers" id="topNumbers"></div>
-    <div class="grid" id="grid"></div>
+<!-- grid generate inputs -->
+<label for="widthInput">Szerokość (kolumny):</label>
+<input type="number" id="widthInput" value="10" min="1">
+<label for="heightInput">Wysokość (wiersze):</label>
+<input type="number" id="heightInput" value="10" min="1">
+<button id="generateBtn">Generuj siatkę</button>
+
+    <!-- slider -->
+<label for="cellSizeSlider">Rozmiar komórek:</label>
+<input type="range" id="cellSizeSlider" min="20" max="50" value="25">
+
+<!-- main wraper generate + numbers -->
+<div id="wrapper">
+    <div></div> <!-- top left corner empty -->
+    <div class="top-numbers"></div> <!-- top -->
+    <div class="left-numbers"></div> <!-- left -->
+    <div id="grid"></div> <!-- main grid -->
+</div>
 
     <script src="script.js"></script>
 </body>
