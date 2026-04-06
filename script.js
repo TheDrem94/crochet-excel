@@ -7,7 +7,7 @@ const topNumbersContainer = document.querySelector(".top-numbers");  // liczby u
 const leftNumbersContainer = document.querySelector(".left-numbers"); // liczby po lewej
 const cellSizeSlider = document.getElementById("cellSizeSlider");     // suwak rozmiaru
 const printBtn = document.getElementById("printBtn");           //przycisk importuj
-
+const imageInput = document.getElementById("imageInput");         // input do wczytywania obrazka
 
 
 // Funkcja generująca liczby u góry
@@ -95,5 +95,73 @@ cellSizeSlider.addEventListener("input", () => {
     leftNumbersContainer.style.gridTemplateRows = `repeat(${height}, var(--cell-size))`;
 });
 
-// Generacja początkowa
+// Funkcja dodawania obrazu
+
+imageInput.addEventListener("change", handleImageAutoGrid);
+
+function handleImageAutoGrid(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.onload = () => {
+        const maxCells = 50; // maksymalna liczba komórek w jednej osi 
+
+        // obliczamy proporcje obrazu
+        let cols = img.width;
+        let rows = img.height;
+
+        if (cols > rows) {
+            if (cols > maxCells) {
+                const scale = maxCells / cols;
+                cols = maxCells;
+                rows = Math.round(rows * scale);
+            }
+        } else {
+            if (rows > maxCells) {
+                const scale = maxCells / rows;
+                rows = maxCells;
+                cols = Math.round(cols * scale);
+            }
+        }
+
+        // ustawiamy inputy width i height automatycznie
+        widthInput.value = cols;
+        heightInput.value = rows;
+
+        // generujemy grid o wymiarach obrazu
+        generateAll();
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = cols;
+        canvas.height = rows;
+
+        // skalujemy obraz do wymiarów gridu
+        ctx.drawImage(img, 0, 0, cols, rows);
+
+        const imageData = ctx.getImageData(0, 0, cols, rows);
+        const data = imageData.data;
+
+        const cells = document.querySelectorAll("#grid .cell");
+
+        // czyszczenie poprzednich kolorów
+        cells.forEach(cell => cell.style.backgroundColor = "");
+
+        for (let i = 0; i < cols * rows; i++) {
+            const r = data[i * 4];
+            const g = data[i * 4 + 1];
+            const b = data[i * 4 + 2];
+
+            cells[i].style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            // próg – czarne = "o"
+            // cells[i].textContent = brightness < 128 ? "X" : "";
+        }
+    };
+
+    img.src = URL.createObjectURL(file);
+}
+
 generateAll();
+

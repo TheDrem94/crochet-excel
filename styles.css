@@ -105,6 +105,12 @@
         height: auto !important;
     }
 
+    .cell {
+        -webkit-print-color-adjust: exact; /* Chrome/Safari */
+        print-color-adjust: exact;         /* Firefox, Edge */
+        background-color: inherit !important; /* upewniamy się, że kolor jest drukowany */
+    }
+
     @page {
         size: A4;
         margin: 1rem;
