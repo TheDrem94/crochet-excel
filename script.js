@@ -8,6 +8,7 @@ const leftNumbersContainer = document.querySelector(".left-numbers"); // liczby 
 const cellSizeSlider = document.getElementById("cellSizeSlider");     // suwak rozmiaru
 const printBtn = document.getElementById("printBtn");           //przycisk importuj
 const imageInput = document.getElementById("imageInput");         // input do wczytywania obrazka
+// const alternateCols = document.getElementById("alternateCols");
 
 
 // Funkcja generująca liczby u góry
@@ -95,8 +96,6 @@ cellSizeSlider.addEventListener("input", () => {
     leftNumbersContainer.style.gridTemplateRows = `repeat(${height}, var(--cell-size))`;
 });
 
-// Funkcja dodawania obrazu
-
 imageInput.addEventListener("change", handleImageAutoGrid);
 
 function handleImageAutoGrid(e) {
@@ -105,7 +104,7 @@ function handleImageAutoGrid(e) {
 
     const img = new Image();
     img.onload = () => {
-        const maxCells = 50; // maksymalna liczba komórek w jednej osi 
+        const maxCells = 90; // maksymalna liczba komórek w jednej osi 
 
         // obliczamy proporcje obrazu
         let cols = img.width;
@@ -149,7 +148,21 @@ function handleImageAutoGrid(e) {
         // czyszczenie poprzednich kolorów
         cells.forEach(cell => cell.style.backgroundColor = "");
 
+        //odczyt checkboxa
+        const brickPattern = document.getElementById("brickPattern").checked;
+
         for (let i = 0; i < cols * rows; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+
+            //PATTERN CEGIEŁKOWY
+            if (brickPattern) {
+                const isOffsetRow = row % 2 === 1;
+                if ((col + (isOffsetRow ? 1 : 0)) % 2 === 1) {
+                    continue; // pomijamy komórkę
+                }
+            }
+
             const r = data[i * 4];
             const g = data[i * 4 + 1];
             const b = data[i * 4 + 2];
@@ -159,7 +172,7 @@ function handleImageAutoGrid(e) {
     };
 
     img.src = URL.createObjectURL(file);
-}
 
 generateAll();
 
+}

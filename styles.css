@@ -1,6 +1,6 @@
 /* global cell sizing */
 :root {
-    --cell-size: 25px; /* default sizing */
+    --cell-size: 20px; /* default sizing */
 }
 
 /* Reset box-sizing */
@@ -108,7 +108,7 @@ a {
         overflow: visible !important;
         height: auto !important;
     }
-
+/* poprawka do druku tła */
     .cell {
         -webkit-print-color-adjust: exact; /* Chrome/Safari */
         print-color-adjust: exact;         /* Firefox, Edge */
