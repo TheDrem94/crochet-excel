@@ -8,13 +8,17 @@
     box-sizing: border-box;
 }
 
-/* slider */
+a {
+    text-decoration: none;
+    color: black;
+}
 
 .menu {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin: 1rem;
+    justify-content: space-between;
+    /* gap: 1rem; */
+    /* margin: 1rem; */
     padding: 1rem;
 }
 
@@ -96,7 +100,7 @@
         transform: none !important;
     }
 
-    button, input, label {
+    button, input, label, hr, footer {
         display: none !important;
     }
 
@@ -108,7 +112,6 @@
     .cell {
         -webkit-print-color-adjust: exact; /* Chrome/Safari */
         print-color-adjust: exact;         /* Firefox, Edge */
-        background-color: inherit !important; /* upewniamy się, że kolor jest drukowany */
     }
 
     @page {

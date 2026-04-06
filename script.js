@@ -155,8 +155,6 @@ function handleImageAutoGrid(e) {
             const b = data[i * 4 + 2];
 
             cells[i].style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-            // próg – czarne = "o"
-            // cells[i].textContent = brightness < 128 ? "X" : "";
         }
     };
 
