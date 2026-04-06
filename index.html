@@ -8,16 +8,18 @@
 </head>
 <body>
 <!-- grid generate inputs -->
+ <div class="menu">
 <label for="widthInput">Szerokość (kolumny):</label>
 <input type="number" id="widthInput" value="10" min="1">
 <label for="heightInput">Wysokość (wiersze):</label>
 <input type="number" id="heightInput" value="10" min="1">
 <button id="generateBtn">Generuj siatkę</button>
+<button id="printBtn">Pobierz PDF</button>
 
     <!-- slider -->
-<label for="cellSizeSlider">Rozmiar komórek:</label>
-<input type="range" id="cellSizeSlider" min="20" max="50" value="25">
-
+    <label for="cellSizeSlider">Rozmiar komórek:</label>
+    <input type="range" id="cellSizeSlider" min="20" max="50" value="25">
+</div>
 <!-- main wraper generate + numbers -->
 <div id="wrapper">
     <div></div> <!-- top left corner empty -->

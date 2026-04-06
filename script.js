@@ -6,6 +6,9 @@ const grid = document.getElementById("grid");                   // właściwy gr
 const topNumbersContainer = document.querySelector(".top-numbers");  // liczby u góry
 const leftNumbersContainer = document.querySelector(".left-numbers"); // liczby po lewej
 const cellSizeSlider = document.getElementById("cellSizeSlider");     // suwak rozmiaru
+const printBtn = document.getElementById("printBtn");           //przycisk importuj
+
+
 
 // Funkcja generująca liczby u góry
 function generateTopNumbers() {
@@ -65,8 +68,18 @@ function generateAll() {
     generateGrid();
 }
 
+//funkcja do importu do PDF
+function printPDF() {
+    window.print();
+}
+
 // Obsługa przycisku generuj
 generateBtn.addEventListener("click", generateAll);
+
+// Obsługa przycisku importuj
+printBtn.addEventListener("click", printPDF)
+
+
 
 // Obsługa suwaka zmieniającego rozmiar komórek
 cellSizeSlider.addEventListener("input", () => {

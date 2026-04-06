@@ -9,13 +9,13 @@
 }
 
 /* slider */
-#cellSizeSlider,
-#widthInput,
-#heightInput,
-#generateBtn {
+
+.menu {
     display: flex;
-    padding: 5px;
-    margin: 10px;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem;
+    padding: 1rem;
 }
 
 /* cell style */
@@ -81,4 +81,32 @@
 /* Grid  */
 #grid {
     display: grid;
+}
+
+@media print {
+    #wrapper, #wrapper {
+        visibility: visible;
+    }
+
+    #wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        transform: none !important;
+    }
+
+    button, input, label {
+        display: none !important;
+    }
+
+    #grid {
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 1rem;
+    }
 }
