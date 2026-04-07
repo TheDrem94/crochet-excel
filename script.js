@@ -8,7 +8,101 @@ const leftNumbersContainer = document.querySelector(".left-numbers"); // liczby 
 const cellSizeSlider = document.getElementById("cellSizeSlider");     // suwak rozmiaru
 const printBtn = document.getElementById("printBtn");           //przycisk importuj
 const imageInput = document.getElementById("imageInput");         // input do wczytywania obrazka
+const symbolModeCheckbox = document.getElementById("symbolMode"); //chceckbox symboli
+const legendDiv = document.getElementById("legend"); //legenda
+const symbolsContainer = document.getElementById("symbolsContainer"); //color picker
 // const alternateCols = document.getElementById("alternateCols");
+
+//paleta kolorów twarde
+
+// const palette = [
+//     [0, 0, 0],
+//     [255, 255, 255],
+//     [255, 0, 0],
+//     [0, 0, 255],
+//     [0, 255, 0]
+// ]
+
+//paleta kolorów miękkie
+const palette = [
+    [30, 30, 30],     // miękka czerń
+    [240, 240, 240],  // off-white
+    [200, 80, 80],    // przygaszona czerwień
+    [80, 120, 200],   // denimowy niebieski
+    [100, 160, 100]   // oliwkowa zieleń
+];
+
+//symbole palety
+const symbols = ["A", "B", "C", "D", "E"];
+
+let currentColor = symbols[0];
+
+palette.forEach(([r, g, b], index) => {
+    const symbol = symbols[index];
+    const btn = document.createElement("button");
+    btn.innerHTML = symbol;
+    btn.style.backgroundColor = `rgb(${r},${g},${b})`;
+    btn.style.color = "white";
+    btn.style.marginRight = "5px";
+    btn.style.width = "30px";
+    btn.style.height = "30px";
+    btn.style.border = "1px solid #000";
+
+    btn.addEventListener("click", () => {
+        currentSymbol = symbol; // ustawiamy aktualny symbol
+        // opcjonalnie: oznaczyć aktywny przycisk
+        document.querySelectorAll("#symbolsContainer button").forEach(b => b.style.outline = "none");
+        btn.style.outline = "2px solid black";
+    });
+
+    symbolsContainer.appendChild(btn);
+});
+
+
+
+//legenda
+
+    palette.forEach(([r, g, b], index) => {
+        const symbol = symbols[index];
+        const item = document.createElement("div");
+
+        // każdy element legendy: symbol + kolor
+        item.innerHTML = `
+            <span style="
+                display:inline-block;
+                width:20px; 
+                height:20px; 
+                background-color: rgb(${r},${g},${b});
+                border:1px solid #000;
+                margin-right:5px;
+                vertical-align:middle;"></span>
+            ${symbol}
+        `;
+
+        legendDiv.appendChild(item);
+    });
+
+
+//przypisanie koloru z palety
+
+function getClosestColorIndex(r, g, b) {
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    palette.forEach(([pr, pg, pb], index) => {
+        const distance =
+            (r - pr) ** 2 +
+            (g - pg) ** 2 +
+            (b - pb) ** 2;
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+        }
+    });
+
+    return closestIndex;
+}
 
 
 // Funkcja generująca liczby u góry
@@ -51,12 +145,22 @@ function generateGrid() {
         cell.classList.add("cell");
 
         cell.addEventListener("click", () => {
-            if (cell.textContent === "o") {
-                cell.textContent = "";
-            } else {
-                cell.textContent = "o";
-            }
-        });
+    if (symbolMode) {
+        // ustawiamy symbol wybrany w pickerze
+        cell.textContent = currentSymbol;
+        // opcjonalnie ustaw kolor tła odpowiadający symbolowi
+        const index = symbols.indexOf(currentSymbol);
+        const [r,g,b] = palette[index];
+        cell.style.backgroundColor = `rgb(${r},${g},${b})`;
+    } else {
+        // stary tryb „klik toggle o”
+        if (cell.textContent === "o") {
+            cell.textContent = "";
+        } else {
+            cell.textContent = "o";
+        }
+    }
+});
 
         grid.appendChild(cell);
     }
@@ -95,6 +199,20 @@ cellSizeSlider.addEventListener("input", () => {
     topNumbersContainer.style.gridTemplateColumns = `repeat(${width}, var(--cell-size))`;
     leftNumbersContainer.style.gridTemplateRows = `repeat(${height}, var(--cell-size))`;
 });
+
+//ograniczenie kolorów 1a
+
+// function quantizeColor(r, g, b, levels = 5) {
+//     const step = 255 / (levels - 1);
+
+//     return [
+//         Math.round(r / step) * step,
+//         Math.round(g / step) * step,
+//         Math.round(b / step) * step
+//     ]
+// }
+
+//funkcja ładująca obraz
 
 imageInput.addEventListener("change", handleImageAutoGrid);
 
@@ -148,8 +266,9 @@ function handleImageAutoGrid(e) {
         // czyszczenie poprzednich kolorów
         cells.forEach(cell => cell.style.backgroundColor = "");
 
-        //odczyt checkboxa
+        //odczyt checkboxa////////////////////////////////////////////////////
         const brickPattern = document.getElementById("brickPattern").checked;
+        
 
         for (let i = 0; i < cols * rows; i++) {
             const col = i % cols;
@@ -167,12 +286,50 @@ function handleImageAutoGrid(e) {
             const g = data[i * 4 + 1];
             const b = data[i * 4 + 2];
 
-            cells[i].style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            //ograniczenie kolorów
+            const colorIndex = getClosestColorIndex(r, g, b);
+            const [nr, ng, nb] = palette[colorIndex];
+
+            cells[i].dataset.colorIndex = colorIndex;
+            cells[i].style.backgroundColor = `rgb(${nr}, ${ng}, ${nb})`;
+            cells[i].textContent = "";
+
+            //1a
+            // cells[i].style.backgroundColor = `rgb(${nr}, ${ng}, ${nb})`;
+
+            //mmniejsze ograniczenie kolorów 1a
+            // const [nr, ng, nb] = quantizeColor(r, g, b, 5);
+            // cells[i].style.backgroundColor = `rgb(${nr}, ${ng}, ${nb})`;
+
+
         }
     };
 
     img.src = URL.createObjectURL(file);
 
+    //checkbox dla symboli
+
+    symbolModeCheckbox.addEventListener("change", () => {
+        const cells = document.querySelectorAll("#grid .cell");
+
+        cells.forEach(cell => {
+            const index = cell.dataset.colorIndex;
+
+            if (index === undefined) return;
+
+            if (symbolModeCheckbox.checked) {
+                cell.textContent = symbols[index];
+                cell.style.backgroundColor = "white";
+                cell.style.color = "black";
+            } else {
+                const [r, g, b] = palette[index];
+                cell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                cell.textContent = "";
+            }
+        });
+    });
+
 generateAll();
+generateLegend();
 
 }

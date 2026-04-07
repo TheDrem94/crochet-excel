@@ -13,6 +13,9 @@
     <label>
         <input type="checkbox" id="brickPattern">pattern cegiełkowy
     </label>
+    <label>
+        <input type="checkbox" id="symbolMode">Tryb Symboli
+    </label>
     <label for="widthInput">Szerokość (kolumny):</label>
     <input type="number" id="widthInput" value="10" min="1">
     <label for="heightInput">Wysokość (wiersze):</label>
@@ -25,6 +28,16 @@
     <input type="range" id="cellSizeSlider" min="20" max="50" value="25">
 </div>
 <hr>
+<!-- Legend -->
+<div id="legendContainer">
+    <h3>Legenda</h3>
+    <div id="legend"></div>
+</div>
+<!-- color picker -->
+<div id="colorPicker">
+    <h3>Wybierz symbol/kolor</h3>
+    <div id="symbolsContainer"></div>
+</div>
 <!-- main wraper generate + numbers -->
 <div id="wrapper">
     <div></div> <!-- top left corner empty -->
