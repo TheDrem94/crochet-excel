@@ -1,6 +1,6 @@
 /* global cell sizing */
 :root {
-    --cell-size: 20px; /* default sizing */
+    --cell-size: 19px; /* default sizing */
 }
 
 /* Reset box-sizing */
@@ -38,6 +38,12 @@ a {
 .cell:hover {
     background-color: #f1f1f1;
 }
+
+/* .cell.empty {
+    background: transparent;
+    border: none;
+    pointer-events: none;
+} */
 
 /* top numbers style */
 .top-numbers div {
