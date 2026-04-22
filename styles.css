@@ -93,6 +93,7 @@ a {
     display: grid;
 }
 
+
 @media print {
     #wrapper, #wrapper {
         visibility: visible;

@@ -19,15 +19,28 @@ const UI = {
 
 //config
 
+// const palette = [
+//     [30, 30, 30],
+//     [240, 240, 240],
+//     [200, 80, 80],
+//     [80, 120, 200],
+//     [100, 160, 100]
+// ];
+
 const palette = [
-    [30, 30, 30],
-    [240, 240, 240],
-    [200, 80, 80],
-    [80, 120, 200],
-    [100, 160, 100]
+    [0,0,0],
+    [255,255,255],
+    [255,0,0],
+    [0,255,0],
+    [0,0,255],
+    [255,255,0],
+    [0,255,255],
+    [255,0,255],
+    [128,128,128],
+    [200,150,100]
 ];
 
-const symbols = ["A", "B", "C", "D", "E"];
+const symbols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 
 
 //stan początkowy
@@ -56,18 +69,65 @@ function getClosestColorIndex(r, g, b) {
     let index = 0;
 
     palette.forEach(([pr, pg, pb], i) => {
-        const dist =
-            0.3 * (r - pr) ** 2 +
-            0.59 * (g - pg) ** 2 +
-            0.11 * (b - pb) ** 2;
+        const dr = r - pr;
+        const dg = g - pg;
+        const db = b - pb;
+
+        const dist = Math.sqrt(
+            2 * dr * dr +
+            4 * dg * dg +
+            3 * db * db
+        );
 
         if (dist < minDistance) {
             minDistance = dist;
             index = i;
         }
+
     });
 
     return index;
+}
+
+//dithering
+
+function applyDithering(data, width, height) {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+
+            const i = (y * width + x) * 4;
+
+            const oldR = data[i];
+            const oldG = data[i + 1];
+            const oldB = data[i + 2];
+            
+            const colorIndex = getClosestColorIndex(oldR, oldG, oldB);
+            const [newR, newG, newB] = palette[colorIndex];
+
+            state.gridData[y * width + x] = colorIndex;
+
+            const errR = oldR - newR;
+            const errG = oldG - newG;
+            const errB = oldB - newB;
+
+            // Floyd–Steinberg dithering
+            distributeError(data, width, height, x + 1, y,     errR, errG, errB, 7/16);
+            distributeError(data, width, height, x - 1, y + 1, errR, errG, errB, 3/16);
+            distributeError(data, width, height, x,     y + 1, errR, errG, errB, 5/16);
+            distributeError(data, width, height, x + 1, y + 1, errR, errG, errB, 1/16);
+        }
+    }
+}
+
+//helper
+function distributeError(data, width, height, x, y, errR, errG, errB, factor) {
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+
+    const i = (y * width + x) * 4;
+
+    data[i]     += errR * factor;
+    data[i + 1] += errG * factor;
+    data[i + 2] += errB * factor;
 }
 
 
@@ -123,7 +183,7 @@ function renderGrid() {
     const cell = document.createElement("div");
     cell.classList.add("cell");
 
-    // 🔴 NOWOŚĆ: brick pattern
+    //brick pattern
     if (shouldSkipCell(i)) {
         cell.classList.add("empty"); // styl CSS
     } else if (colorIndex !== null) {
@@ -141,6 +201,28 @@ function renderGrid() {
 
     UI.grid.appendChild(fragment);
 }
+
+//redukcja kolorów
+
+function reducePalette(data, width, height, maxColors = 8) {
+    const buckets = {};
+
+    for (let i = 0; i < width * height; i++) {
+        const r = Math.round(data[i * 4] / 32) * 32;
+        const g = Math.round(data[i * 4 + 1] / 32) * 32;
+        const b = Math.round(data[i * 4 + 2] / 32) * 32;
+
+        const key = `${r},${g},${b}`;
+        buckets[key] = (buckets[key] || 0) + 1;
+    }
+
+    return Object.entries(buckets)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, maxColors)
+        .map(([key]) => key.split(",").map(Number));
+}
+
+
 
 
 //logika komóeki
@@ -205,7 +287,7 @@ function handleImageUpload(e) {
     const img = new Image();
 
     img.onload = () => {
-        const max = 90;
+        const max = 60;
         let cols = img.width;
         let rows = img.height;
 
@@ -225,9 +307,19 @@ function handleImageUpload(e) {
         canvas.width = cols;
         canvas.height = rows;
 
+        ctx.imageSmoothingEnabled = true;
+        ctx.filter = "blur(0.7px)";
         ctx.drawImage(img, 0, 0, cols, rows);
+        ctx.filter = "none";
+
+        // ctx.drawImage(img, 0, 0, cols, rows);
 
         const data = ctx.getImageData(0, 0, cols, rows).data;
+
+        const newPalette = reducePalette(data, cols, rows, 6);
+
+        palette.length = 0;
+        newPalette.forEach(c => palette.push(c));
 
         for (let i = 0; i < cols * rows; i++) {
             const r = data[i * 4];
@@ -237,13 +329,43 @@ function handleImageUpload(e) {
             const index = getClosestColorIndex(r, g, b);
             state.gridData[i] = index;
         }
-
         renderGrid();
     };
 
     img.src = URL.createObjectURL(file);
 }
 
+function smoothGrid() {
+    const copy = [...state.gridData];
+
+    for (let i = 0; i <getComputedStyle.length; i++) {
+        const neighbors = [];
+
+        const x = i % state.widthl
+        const y = Math.floor(i / state.width);
+
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                const nx = x + dx;
+                const ny = y + dy;
+
+                if (nx >= 0 && nx < state.width && ny >= 0 && ny <state.height) {
+                    neighbors.push(copy[ny * state.width + nx]);
+                }
+            }
+        }
+
+        const counts = {};
+        neighbors.forEach(n => {
+            counts[n] = (counts[n] || 0) + 1;
+        });
+
+        const mostCommon = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])[0][0];
+
+        state.gridData[i] = Number(mostCommon);
+    }
+}
 
 //paleta i colorPicker
 
@@ -260,6 +382,8 @@ function initPalette() {
 
         UI.symbolsContainer.appendChild(btn);
     });
+
+    
 }
 
 
@@ -311,3 +435,4 @@ UI.cellSizeSlider.addEventListener("input", () => {
 initPalette();
 initLegend();
 generateGrid();
+smoothGrid();
